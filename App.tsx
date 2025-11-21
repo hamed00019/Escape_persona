@@ -39,106 +39,108 @@ export default function App() {
   const [rawImageMimeType, setRawImageMimeType] = useState<string>('image/png');
 
   const generateAssets = async (persona: PersonaResult) => {
-    const API_KEY = process.env.API_KEY;
-    
+    //const API_KEY = process.env.API_KEY;
+    const API_KEY = "AIzaSyB3-Nih44mUzgR-nPL5b4hPa7pko5mXgGs";
+
     if (!API_KEY) {
-        console.error("API Key not found in environment");
-        setLoadingStatus("خطای تنظیمات (API Key)");
-        return;
+      console.error("API Key not found in environment");
+      setLoadingStatus("خطای تنظیمات (API Key)");
+      return;
     }
 
     try {
-        setLoadingStatus("در حال اتصال به هوش مصنوعی...");
-        
-        const ai = new GoogleGenAI({ apiKey: API_KEY });
-        
-        // 1. Generate Image (Gemini 2.5 Flash Image)
-        setLoadingStatus("طراحی کاراکتر (Nano Banana)...");
-        
-        try {
-            const imageResponse = await ai.models.generateContent({
-                model: 'gemini-2.5-flash-image',
-                contents: {
-                    parts: [{ text: persona.aiPrompt }]
-                },
-                config: {
-                    responseModalities: [Modality.IMAGE],
-                },
-            });
+      setLoadingStatus("در حال اتصال به هوش مصنوعی...");
 
-            const part = imageResponse.candidates?.[0]?.content?.parts?.[0];
-            if (part?.inlineData) {
-                const base64 = part.inlineData.data;
-                const mimeType = part.inlineData.mimeType || 'image/png';
-                
-                if (base64) {
-                    setRawBase64Image(base64);
-                    setRawImageMimeType(mimeType);
-                    setGeneratedImage(`data:${mimeType};base64,${base64}`);
-                    playSound('scan');
-                }
-            }
-        } catch (e) {
-            console.error("Image generation failed", e);
-            setLoadingStatus("خطا در ساخت تصویر");
+      const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+      // 1. Generate Image (Gemini 2.5 Flash Image)
+      setLoadingStatus("طراحی کاراکتر (Nano Banana)...");
+
+      try {
+        const imageResponse = await ai.models.generateContent({
+          model: 'gemini-2.5-flash-image',
+          contents: {
+            parts: [{ text: persona.aiPrompt }]
+          },
+          config: {
+            responseModalities: [Modality.IMAGE],
+          },
+        });
+
+        const part = imageResponse.candidates?.[0]?.content?.parts?.[0];
+        if (part?.inlineData) {
+          const base64 = part.inlineData.data;
+          const mimeType = part.inlineData.mimeType || 'image/png';
+
+          if (base64) {
+            setRawBase64Image(base64);
+            setRawImageMimeType(mimeType);
+            setGeneratedImage(`data:${mimeType};base64,${base64}`);
+            playSound('scan');
+          }
         }
-        
-        // Complete the process (Image only)
-        setLoadingStatus(""); 
+      } catch (e) {
+        console.error("Image generation failed", e);
+        setLoadingStatus("خطا در ساخت تصویر");
+      }
+
+      // Complete the process (Image only)
+      setLoadingStatus("");
 
     } catch (error) {
-        console.error("General Asset generation error", error);
-        setLoadingStatus("خطای ارتباط با سرور");
+      console.error("General Asset generation error", error);
+      setLoadingStatus("خطای ارتباط با سرور");
     }
   };
 
   const handleGenerateVideo = async () => {
     if (!result || !rawBase64Image) return;
-    
-    const API_KEY = process.env.API_KEY;
+
+    // const API_KEY = process.env.API_KEY;
+    const API_KEY = "AIzaSyB3-Nih44mUzgR-nPL5b4hPa7pko5mXgGs";
     if (!API_KEY) return;
 
     setLoadingStatus("ساخت ویدیو (Veo 3)...");
     playSound('click');
 
     try {
-         const ai = new GoogleGenAI({ apiKey: API_KEY });
+      const ai = new GoogleGenAI({ apiKey: API_KEY });
 
-         const operation = await ai.models.generateVideos({
-            model: 'veo-2.0-generate-001',
-            image: {
-                imageBytes: rawBase64Image,
-                mimeType: rawImageMimeType,
-            },
-            // Refined prompt for looped, living portrait effect
-            prompt: result.aiPrompt + ", fantasy art style, living portrait, subtle cinematic movement, gentle breathing, blinking, looking at camera, seamless loop style, photorealistic render, slow motion",
-            config: {
-                numberOfVideos: 1,
-                // resolution: '720p',
-                aspectRatio: '9:16'
-            }
-        });
-
-        let op = operation;
-        while (!op.done) {
-            await new Promise(resolve => setTimeout(resolve, 4000));
-            op = await ai.operations.getVideosOperation({operation: op});
-            setLoadingStatus("رندر نهایی ویدیو...");
+      const operation = await ai.models.generateVideos({
+        model: 'veo-2.0-generate-001',
+        image: {
+          imageBytes: rawBase64Image,
+          mimeType: rawImageMimeType,
+        },
+        // Refined prompt for looped, living portrait effect
+        prompt: result.aiPrompt + ", fantasy art style, living portrait, subtle cinematic movement, gentle breathing, blinking, looking at camera, seamless loop style, photorealistic render, slow motion",
+        config: {
+          numberOfVideos: 1,
+          // resolution: '720p',
+          aspectRatio: '9:16'
         }
+      });
 
-        const downloadLink = op.response?.generatedVideos?.[0]?.video?.uri;
-        if (downloadLink) {
-            const videoRes = await fetch(`${downloadLink}&key=${API_KEY}`);
-            const videoBlob = await videoRes.blob();
-            const videoUrl = URL.createObjectURL(videoBlob);
-            setGeneratedVideo(videoUrl);
-            playSound('success');
-        }
+      let op = operation;
+      while (!op.done) {
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        op = await ai.operations.getVideosOperation({ operation: op });
+        setLoadingStatus("رندر نهایی ویدیو...");
+      }
+
+      const downloadLink = op.response?.generatedVideos?.[0]?.video?.uri;
+      if (downloadLink) {
+        const videoRes = await fetch(`${downloadLink}&key=${API_KEY}`);
+        const videoBlob = await videoRes.blob();
+        const videoUrl = URL.createObjectURL(videoBlob);
+        setGeneratedVideo(videoUrl);
+        playSound('success');
+      }
     } catch (videoError: any) {
-        console.warn("Veo generation failed", videoError);
-        alert("متاسفانه ساخت ویدیو با خطا مواجه شد. لطفاً دوباره تلاش کنید.");
+      console.warn("Veo generation failed", videoError);
+      alert("متاسفانه ساخت ویدیو با خطا مواجه شد. لطفاً دوباره تلاش کنید.");
     } finally {
-        setLoadingStatus("");
+      setLoadingStatus("");
     }
   };
 
@@ -190,7 +192,7 @@ export default function App() {
       <main className="flex-1 relative w-full max-w-2xl mx-auto h-full">
         <AnimatePresence mode="wait">
           {state === 'INTRO' && (
-            <motion.div 
+            <motion.div
               key="intro"
               className="h-full w-full"
               exit={{ opacity: 0, y: -20 }}
@@ -201,7 +203,7 @@ export default function App() {
           )}
 
           {state === 'QUIZ' && (
-            <motion.div 
+            <motion.div
               key="quiz"
               className="h-full w-full"
               initial={{ opacity: 0 }}
@@ -209,7 +211,7 @@ export default function App() {
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.5 }}
             >
-              <QuestionCard 
+              <QuestionCard
                 question={questions[currentQuestionIndex]}
                 onAnswer={handleAnswer}
                 totalQuestions={questions.length}
@@ -219,7 +221,7 @@ export default function App() {
           )}
 
           {state === 'ANALYZING' && (
-            <motion.div 
+            <motion.div
               key="analyzing"
               className="h-full w-full"
               initial={{ opacity: 0 }}
@@ -231,17 +233,17 @@ export default function App() {
           )}
 
           {state === 'RESULT' && result && (
-            <motion.div 
+            <motion.div
               key="result"
               className="h-full w-full overflow-y-auto"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
-              <ResultScreen 
-                result={result} 
-                stats={stats} 
-                onRestart={handleRestart} 
+              <ResultScreen
+                result={result}
+                stats={stats}
+                onRestart={handleRestart}
                 generatedImage={generatedImage}
                 generatedVideo={generatedVideo}
                 loadingStatus={loadingStatus}
