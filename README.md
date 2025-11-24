@@ -11,7 +11,7 @@ View your app in AI Studio: https://ai.studio/apps/drive/1eYf25ijDuE_K5OJzFxit88
 ## Run Locally
 
 **Prerequisites:**  Node.js
-
+## fantasy art style, living portrait, subtle cinematic movement, gentle breathing, blinking, looking at camera, seamless loop style, photorealistic render, slow motion
 
 1. Install dependencies:
    `npm install`

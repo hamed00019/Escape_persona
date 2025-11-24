@@ -8,8 +8,8 @@ import { ResultScreen } from './components/ResultScreen';
 import { questions } from './data/questions';
 import { calculatePersona } from './utils/calculatePersona';
 import { Option, Stats, PersonaResult } from './types';
-import { GoogleGenAI, Modality } from "@google/genai";
 import { playSound } from './utils/sound';
+import { BackgroundMusic } from './components/BackgroundMusic';
 
 type AppState = 'INTRO' | 'QUIZ' | 'ANALYZING' | 'RESULT';
 
@@ -29,119 +29,34 @@ export default function App() {
   // Prevent double submission
   const isProcessingRef = useRef(false);
 
-  // Asset Generation State
+  // Asset State - using pre-made files only
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [generatedVideo, setGeneratedVideo] = useState<string | null>(null);
   const [loadingStatus, setLoadingStatus] = useState<string>("");
 
-  // Store the raw base64 image to use for video generation later
-  const [rawBase64Image, setRawBase64Image] = useState<string | null>(null);
-  const [rawImageMimeType, setRawImageMimeType] = useState<string>('image/png');
-
-  const generateAssets = async (persona: PersonaResult) => {
-    //const API_KEY = process.env.API_KEY;
-    const API_KEY = "AIzaSyB3-Nih44mUzgR-nPL5b4hPa7pko5mXgGs";
-
-    if (!API_KEY) {
-      console.error("API Key not found in environment");
-      setLoadingStatus("خطای تنظیمات (API Key)");
-      return;
-    }
-
+  const loadPreMadeAssets = async (persona: PersonaResult) => {
     try {
-      setLoadingStatus("در حال اتصال به هوش مصنوعی...");
+      setLoadingStatus("در حال بارگذاری...");
 
-      const ai = new GoogleGenAI({ apiKey: API_KEY });
+      // Use pre-made image
+      const imagePath = `/images/${persona.type.toLowerCase()}.png`;
 
-      // 1. Generate Image (Gemini 2.5 Flash Image)
-      setLoadingStatus("طراحی کاراکتر (Nano Banana)...");
+      // Simulate loading delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 800));
 
-      try {
-        const imageResponse = await ai.models.generateContent({
-          model: 'gemini-2.5-flash-image',
-          contents: {
-            parts: [{ text: persona.aiPrompt }]
-          },
-          config: {
-            responseModalities: [Modality.IMAGE],
-          },
-        });
-
-        const part = imageResponse.candidates?.[0]?.content?.parts?.[0];
-        if (part?.inlineData) {
-          const base64 = part.inlineData.data;
-          const mimeType = part.inlineData.mimeType || 'image/png';
-
-          if (base64) {
-            setRawBase64Image(base64);
-            setRawImageMimeType(mimeType);
-            setGeneratedImage(`data:${mimeType};base64,${base64}`);
-            playSound('scan');
-          }
-        }
-      } catch (e) {
-        console.error("Image generation failed", e);
-        setLoadingStatus("خطا در ساخت تصویر");
-      }
-
-      // Complete the process (Image only)
+      setGeneratedImage(imagePath);
+      playSound('scan');
       setLoadingStatus("");
 
     } catch (error) {
-      console.error("General Asset generation error", error);
-      setLoadingStatus("خطای ارتباط با سرور");
+      console.error("Asset loading error", error);
+      setLoadingStatus("");
     }
   };
 
-  const handleGenerateVideo = async () => {
-    if (!result || !rawBase64Image) return;
-
-    // const API_KEY = process.env.API_KEY;
-    const API_KEY = "AIzaSyB3-Nih44mUzgR-nPL5b4hPa7pko5mXgGs";
-    if (!API_KEY) return;
-
-    setLoadingStatus("ساخت ویدیو (Veo 3)...");
-    playSound('click');
-
-    try {
-      const ai = new GoogleGenAI({ apiKey: API_KEY });
-
-      const operation = await ai.models.generateVideos({
-        model: 'veo-2.0-generate-001',
-        image: {
-          imageBytes: rawBase64Image,
-          mimeType: rawImageMimeType,
-        },
-        // Refined prompt for looped, living portrait effect
-        prompt: result.aiPrompt + ", fantasy art style, living portrait, subtle cinematic movement, gentle breathing, blinking, looking at camera, seamless loop style, photorealistic render, slow motion",
-        config: {
-          numberOfVideos: 1,
-          // resolution: '720p',
-          aspectRatio: '9:16'
-        }
-      });
-
-      let op = operation;
-      while (!op.done) {
-        await new Promise(resolve => setTimeout(resolve, 4000));
-        op = await ai.operations.getVideosOperation({ operation: op });
-        setLoadingStatus("رندر نهایی ویدیو...");
-      }
-
-      const downloadLink = op.response?.generatedVideos?.[0]?.video?.uri;
-      if (downloadLink) {
-        const videoRes = await fetch(`${downloadLink}&key=${API_KEY}`);
-        const videoBlob = await videoRes.blob();
-        const videoUrl = URL.createObjectURL(videoBlob);
-        setGeneratedVideo(videoUrl);
-        playSound('success');
-      }
-    } catch (videoError: any) {
-      console.warn("Veo generation failed", videoError);
-      alert("متاسفانه ساخت ویدیو با خطا مواجه شد. لطفاً دوباره تلاش کنید.");
-    } finally {
-      setLoadingStatus("");
-    }
+  const handleGenerateVideo = () => {
+    // Placeholder - not used since we load pre-made videos automatically
+    console.log("Using pre-made videos");
   };
 
   const handleStart = () => {
@@ -161,12 +76,19 @@ export default function App() {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
-      // Quiz Finished - Determine Persona and Start Generation immediately
-      isProcessingRef.current = true; // Lock to prevent double triggering
+      // Quiz Finished
+      isProcessingRef.current = true;
       const finalPersona = calculatePersona(newStats);
       setResult(finalPersona);
       setState('ANALYZING');
-      generateAssets(finalPersona);
+
+      // Load pre-made video immediately
+      if (finalPersona.videoUrl) {
+        setGeneratedVideo(finalPersona.videoUrl);
+      }
+
+      // Load pre-made image
+      loadPreMadeAssets(finalPersona);
     }
   };
 
@@ -180,15 +102,14 @@ export default function App() {
     setResult(null);
     setGeneratedImage(null);
     setGeneratedVideo(null);
-    setRawBase64Image(null);
     setLoadingStatus("");
-    isProcessingRef.current = false; // Unlock
+    isProcessingRef.current = false;
     setState('INTRO');
   };
 
   return (
     <div className="w-full h-screen bg-slate-900 text-slate-100 overflow-hidden flex flex-col">
-      {/* Main Content Area */}
+      <BackgroundMusic />
       <main className="flex-1 relative w-full max-w-2xl mx-auto h-full">
         <AnimatePresence mode="wait">
           {state === 'INTRO' && (

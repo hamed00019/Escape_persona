@@ -1,5 +1,5 @@
 
-export type PersonaType = 'MASTERMIND' | 'TANK' | 'SCREAMER' | 'SCOUT' | 'CHAOS';
+export type PersonaType = 'MASTERMIND' | 'TANK' | 'SCREAMER' | 'SCOUT' | 'CHAOS' | 'COMMANDER' | 'ENGINEER' | 'MEDIUM';
 
 export interface Stats {
   bravery: number;
@@ -16,7 +16,16 @@ export interface PersonaResult {
   color: string;
   iconName: string;
   aiPrompt: string;
-  recommendedGames: string[];
+  videoPrompt: string;
+  shareText: string;
+  voicePrompt: string;
+  recommendedGames: { title: string; url: string }[];
+  videoUrl: string;
+  rarity: string; // e.g., "5%"
+  bestMatch: PersonaType[];
+  worstMatch: PersonaType[];
+  motto: string;
+  survivalRate: string;
 }
 
 export interface Option {
