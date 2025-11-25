@@ -104,7 +104,7 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess, personaResult, st
                                 placeholder="شماره موبایل (مثلا 0912...)"
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
-                                className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pr-10 pl-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-colors dir-rtl"
+                                className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pr-10 pl-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-colors text-left"
                                 maxLength={11}
                             />
                         </div>

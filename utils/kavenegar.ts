@@ -1,24 +1,30 @@
-import axios from 'axios';
-
-const API_KEY = '616862494F484C616E6A54616E7A726F554B764B6874456563795467624E6F7165425474463065627557553D';
-
 export const sendOtp = async (phoneNumber: string, code: string) => {
     try {
-        // Note: Calling this directly from the browser might be blocked by CORS policies of the Kavenegar API.
-        // In a production environment, this should be done via a backend proxy.
-        const url = `https://api.kavenegar.com/v1/${API_KEY}/verify/lookup.json`;
+        // Temporary Webhook for testing
+        const webhookUrl = 'https://n8n.ekeepa-dev.ir/webhook/escape_persona';
 
-        const response = await axios.get(url, {
-            params: {
-                receptor: phoneNumber,
-                token: code,
-                template: 'login-otp'
-            }
+        // Use URLSearchParams for x-www-form-urlencoded to support no-cors
+        const params = new URLSearchParams();
+        params.append('phoneNumber', phoneNumber);
+        params.append('code', code);
+        params.append('source', 'escape_persona_app');
+        params.append('timestamp', new Date().toISOString());
+
+        // mode: 'no-cors' allows sending without CORS errors, but response is opaque (cant read it)
+        await fetch(webhookUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params
         });
 
-        return response.data;
+        console.log('OTP sent to webhook (blind mode)');
+        // We assume success because we can't read the response in no-cors mode
+        return { status: 200, message: 'Sent' };
     } catch (error) {
-        console.error('Error sending OTP:', error);
+        console.error('Error sending OTP to webhook:', error);
         throw error;
     }
 };
