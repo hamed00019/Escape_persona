@@ -6,116 +6,49 @@
 
 ## ۱. معرفی پروژه (Project Overview)
 
-**Escape Persona** یک وب‌اپلیکیشن تعاملی گیمیفای شده است که با پرسیدن سوالاتی در سناریوی "اتاق فرار"، شخصیت و نقش کاربر را در یک تیم اتاق فرار تحلیل می‌کند.
-
-### اصول کلیدی:
-*   **گیمیفیکیشن (Gamification):** استفاده از المان‌های بازی (سوالات سناریو محور، امتیازدهی پنهان، کارت‌های شخصیت، مدال‌ها) برای جذاب کردن پروسه روانشناسی.
-*   **سناریو محور:** سوالات به جای پرسش مستقیم (مثلاً "آیا شجاع هستید؟")، کاربر را در موقعیت قرار می‌دهند (مثلاً "برق رفت و صدای اره برقی آمد، چه می‌کنی؟").
-*   **طراحی بصری (Visual Design):** استفاده از تم تاریک، نئونی و مرموز برای القای حس اتاق فرار.
-
----
-
-## ۲. منطق و محاسبات (Logic & Calculations)
-
-سیستم بر اساس ۴ ویژگی اصلی (Stats) امتیازدهی می‌کند:
-1.  **شجاعت (Bravery):** میزان نترس بودن و پیش‌قدم شدن در خطر.
-2.  **منطق (Logic):** توانایی حل مسئله، پازل‌های ریاضی و تفکر تحلیلی.
-3.  **دقت/مشاهده (Observation):** توجه به جزئیات محیطی و پیدا کردن سرنخ‌ها.
-4.  **رهبری (Leadership):** توانایی مدیریت تیم و تصمیم‌گیری در بحران.
-
-### سوالات و وزن‌دهی (Questions & Weights)
-
-در مجموع ۱۲ سوال وجود دارد. هر پاسخ به یک یا چند ویژگی امتیاز مثبت یا منفی می‌دهد.
-
-| شناسه | سوال (خلاصه) | گزینه ۱ (اثر) | گزینه ۲ (اثر) |
-| :--- | :--- | :--- | :--- |
-| 1 | اتاق تاریک و صدای ناله | چراغ‌قوه و حرکت جلو (Bravery +3, Leadership +2) | چسبیدن به دیوار (Bravery -2, Observation +1) |
-| 2 | دعوا سر قفل عددی | مدیریت و سکوت (Leadership +3, Logic +1) | گشتن بی‌سروصدا (Observation +2, Logic +1) |
-| 3 | دستگاه عجیب با سیم | بررسی مهندسی (Logic +2, Observation +2) | فشار دکمه قرمز (Bravery +1, Logic -2) |
-| 4 | نامه خون‌آلود | خواندن سریع (Observation +2, Bravery +1) | گشتن دنبال عدد (Logic +2, Observation -1) |
-| 5 | حمله با اره برقی | پرت کردن حواس (Bravery +3, Leadership +1) | جیغ و فرار (Bravery -3) |
-| 6 | پازل سخت ریاضی | حل با کاغذ و قلم (Logic +3) | واگذاری به تیم (Leadership +1, Observation +2) |
-| 7 | دریچه تنگ در ارتفاع | رفتن خود (Bravery +2, Observation +1) | فرستادن سبک‌وزن (Leadership +2, Logic +1) |
-| 8 | دکوراسیون احضار روح | درک ارتباط اشیاء (Observation +3, Logic +1) | دست نزدن و فرار (Bravery -1, Logic +1) |
-| 9 | ۵ دقیقه مانده و استرس | مرور سرنخ‌ها (Leadership +3) | امتحان شانسی (Logic -2, Bravery +2) |
-| 10 | جعبه فیوز خراب | تعمیر کردن (Logic +2, Observation +2) | فاصله گرفتن (Logic -1) |
-| 11 | صدای گریه بچه | گوش تیز کردن (Observation +3) | آواز خواندن (Bravery -2) |
-| 12 | پایان بازی | "دیدید گفتم؟" (Logic +2, Leadership -1) | "خوش گذشت!" (Bravery +2, Leadership +1) |
-
-### الگوریتم محاسبه شخصیت (Persona Algorithm)
-
-تابع `calculatePersona` در فایل `utils/calculatePersona.ts` مسئول تعیین شخصیت نهایی است. اولویت‌بندی به شرح زیر است:
-
-1.  **SCREAMER (جیغ‌زن):** اگر `Bravery <= -3`. (ترس بر همه چیز غلبه دارد).
-2.  **CHAOS (آشوبگر):** اگر مجموع امتیازات درگیری (`Total Engagement`) کمتر از ۶ باشد. (بازیکن منفعل یا بی‌هدف).
-3.  **ترکیبات خاص (Hybrids):**
-    *   `COMMANDER`: اگر `Leadership >= 4` و `Logic >= 3`.
-    *   `ENGINEER`: اگر `Logic >= 4` و `Observation >= 3`.
-    *   `MEDIUM`: اگر `Observation >= 4` و `Bravery >= 3`.
-4.  **تسلط تک ویژگی (Dominant Stat):** بالاترین امتیاز بین ۴ ویژگی، شخصیت را تعیین می‌کند (اگر بالای حد نصاب ۵ باشد).
-5.  **لایه‌های میانی و فال‌بک:** اگر هیچکدام نبود، بر اساس بالاترین امتیاز نسبی تصمیم‌گیری می‌شود.
-
----
-
-## ۳. شخصیت‌ها (Personas)
-
-در حال حاضر ۸ کهن‌الگو (Archetype) تعریف شده است.
-
-### 1. مغز متفکر (The Mastermind)
-*   **ویژگی بارز:** منطق بالا.
-*   **توصیف:** حلال پازل‌ها، خونسرد، تحلیل‌گر.
-*   **رنگ:** Cyan (آبی روشن).
-*   **آیکون:** Brain.
-*   **AI Prompt:** "A hyper-realistic cinematic portrait of a genius mastermind in a high-tech escape room, analyzing complex holographic puzzles, cool blue lighting, intense focus, cyberpunk aesthetic, 8k resolution."
-
-### 2. سپر بلا / تانک (The Tank)
-*   **ویژگی بارز:** شجاعت بالا.
-*   **توصیف:** محافظ تیم، پیش‌قدم در تاریکی، انجام کارهای فیزیکی.
-*   **رنگ:** Emerald (سبز زمردی).
-*   **آیکون:** Shield.
-*   **AI Prompt:** "A hyper-realistic cinematic portrait of a brave protector standing in front of a dark scary corridor, holding a flashlight, strong stance, protective gear, warm rim lighting, heroic atmosphere, 8k resolution."
-
-### 3. جیغ‌زن حرفه‌ای (The Screamer)
-*   **ویژگی بارز:** شجاعت بسیار پایین.
-*   **توصیف:** سیستم هشدار تیم، ترسو، ایجاد هیجان با جیغ زدن.
-*   **رنگ:** Rose (صورتی/قرمز).
-*   **آیکون:** Ghost.
-*   **AI Prompt:** "A hyper-realistic cinematic portrait of a terrified person screaming in a haunted house, expressive face, dynamic motion blur, dramatic horror lighting, spooky background, 8k resolution."
-
-### 4. کاوشگر / عقاب (The Scout)
-*   **ویژگی بارز:** دقت/مشاهده بالا.
-*   **توصیف:** پیدا کننده کلیدها و سرنخ‌های مخفی، جزئی‌نگر.
-*   **رنگ:** Amber (زرد کهربایی).
-*   **آیکون:** Eye.
-*   **AI Prompt:** "A hyper-realistic cinematic portrait of an observant detective examining a clue with a magnifying glass, dusty attic setting, shafts of light, detailed textures, mystery atmosphere, 8k resolution."
-
 ### 5. عامل آشوب (The Chaos Agent)
-*   **ویژگی بارز:** غیرقابل پیش‌بینی / منطق پایین یا شانس بالا.
-*   **توصیف:** فشار دادن دکمه‌های قرمز، کارهای شانسی، خرابکاری خنده‌دار.
+*   **لقب:** «دست‌کج»
+*   **نقطه ضعف:** بیش‌فعالی مخرب
+*   **نقل قول:** "عه... اینو نباید می‌کشیدم؟"
+*   **شعار:** اوه، خراب شد!
+*   **توصیف:** چرا دکمه قرمز رو فشار دادی؟ چون قرمز بود! شما کسی هستی که وسط حل معما، فیوز برق رو قطع می‌کنی فقط برای اینکه ببینی چی میشه. گیم‌مسترها عکس شما رو زدن رو دیوار اتاق کنترل با عنوان «تحت تعقیب». تیم شما برنده نشد، ولی قطعا شما بهتون خوش گذشت.
 *   **رنگ:** Fuchsia (بنفش روشن).
 *   **آیکون:** Zap.
-*   **AI Prompt:** "A hyper-realistic cinematic portrait of a chaotic character laughing while pressing a big red button, sparks flying, dynamic angle, vibrant neon colors, mischievous expression, 8k resolution."
+*   **AI Prompt:** "Dynamic portrait of a mischievous character laughing while pressing a giant red button marked "DO NOT PRESS", sparks flying everywhere, background is exploding or collapsing playfully, vibrant neon purple and fuchsia lighting, comic book style, energetic, 8k, --ar 9:16"
+*   **Video Prompt:** "Slow motion shot of a finger pressing a big red button. Cut to chaos: lights flashing, smoke erupting, the character laughing maniacally while others run in background. Purple neon vibe."
 
 ### 6. فرمانده (The Commander)
-*   **ویژگی بارز:** رهبری بالا.
-*   **توصیف:** مدیریت تیم، تقسیم وظایف، چسب نگهدارنده گروه.
+*   **لقب:** «ناپلئون بی‌پارت»
+*   **نقطه ضعف:** دستور دادن بدون عمل
+*   **نقل قول:** "علی تو برو اونجا، سارا تو بگرد... منم اینجا نظارت می‌کنم."
+*   **شعار:** مشکل از استراتژی نبود، از اجرا بود
+*   **توصیف:** شما ۵۰ دقیقه از وقت بازی رو صرف «مدیریت بحران» و تقسیم وظایف کردی و ۱۰ دقیقه آخر رو صرف توجیه اینکه چرا باختیم. در حالی که بقیه داشتن عرق می‌ریختن، شما داشتی با دست‌به‌سینه ایستادن، روحیه‌شون رو تقویت می‌کردی. ممنون رئیس، خیلی کمک کردی!
 *   **رنگ:** Indigo (نیلی).
 *   **آیکون:** Shield (یا نشان نظامی).
-*   **AI Prompt:** "A hyper-realistic cinematic portrait of a charismatic leader pointing forward, tactical gear, determined expression, team in background, dramatic lighting, leadership vibe, 8k resolution."
+*   **AI Prompt:** "Cinematic low-angle portrait of a leader pointing forward dramatically, wearing a majestic military outfit made of escape room junk (bucket helmet, broom staff), serious expression, background shows team working hard, indigo and royal blue lighting, satirical heroism, 8k, --ar 9:16"
+*   **Video Prompt:** "Static shot of the character standing still, arms crossed, nodding approvingly while chaos unfolds behind them (people running, things falling). Text overlay: "MANAGEMENT". Indigo lighting."
 
 ### 7. مهندس (The Engineer)
-*   **ویژگی بارز:** ترکیب منطق و دقت.
-*   **توصیف:** عاشق مکانیزم‌ها، قفل‌های مکانیکی، سیم‌کشی.
+*   **لقب:** «آقای ایمنی»
+*   **نقطه ضعف:** مهندسی معکوس بی‌جا
+*   **نقل قول:** "این قفل مگنتیه، اگه سیمش رو قطع کنم باز میشه..."
+*   **شعار:** پیچ‌گوشتی داری؟
+*   **توصیف:** چرا رمز رو پیدا کنم وقتی می‌تونم قفل دیجیتال رو هک کنم؟ شما سعی کردی با گیره کاغذ پریز برق رو باز کنی تا «مدارش رو بای‌پس کنی». گیم‌مستر ۳ بار با بلندگو داد زد: «دست نزن مهندس! اون دکوره!». ۹۴٪ از مهندس‌ها به خاطر باز کردن پیچ‌های پنل برق بن شده‌اند.
 *   **رنگ:** Blue (آبی).
 *   **آیکون:** Brain/Gear.
-*   **AI Prompt:** "A hyper-realistic cinematic portrait of an engineer working on a complex mechanical lock, sparks, steampunk vibes, goggles, intense focus on hands, detailed machinery, 8k resolution."
+*   **AI Prompt:** "Close-up of a character covered in soot and wires, holding a screwdriver and a disassembled electronic lock, looking confused but determined, sparks showering down, steampunk aesthetic mixed with modern tech, industrial blue and orange lighting, highly detailed textures, 8k, --ar 9:16"
+*   **Video Prompt:** "Close up on hands trying to connect two sparking wires. Camera pulls back to show the character's hair standing up from electric shock. They smile sheepishly. Industrial lighting."
 
 ### 8. مدیوم / احضارگر (The Medium)
-*   **ویژگی بارز:** ترکیب دقت و شجاعت (حس ششم).
-*   **توصیف:** ارتباط با داستان بازی، حس کردن چیزهای نامرئی.
+*   **لقب:** «جن‌گیر»
+*   **نقطه ضعف:** توهم ماورایی
+*   **نقل قول:** "هیس... دارن باهام حرف می‌زنن."
+*   **شعار:** من می‌بینم (چیزایی که نیست)
+*   **توصیف:** شما کلاً تو باغ نبودی. وقتی تیم داشت معما حل می‌کرد، شما داشتی با مانکنِ گوشه اتاق ارتباط برقرار می‌کردی چون «انرژی سنگینی» داشت. یه جا گفتی «حس می‌کنم روح اینجاست»... داداش اون اکتور بود که داشت سیگار می‌کشید.
 *   **رنگ:** Purple (بنفش).
 *   **آیکون:** Ghost/Crystal Ball.
-*   **AI Prompt:** "A hyper-realistic cinematic portrait of a mystic medium touching a glowing spirit board, ethereal atmosphere, purple mist, mysterious eyes, supernatural vibes, 8k resolution."
+*   **AI Prompt:** "Ethereal portrait of a character staring blankly into the void, holding a candle, surrounded by purple smoke and faint ghostly figures, eyes wide and mystical, gothic atmosphere, spooky but whimsical, violet and silver lighting, volumetric fog, 8k, --ar 9:16"
+*   **Video Prompt:** "Slow tracking shot circling the character who is whispering to a wall. The camera reveals the wall is just empty. Purple mist swirls around them. Mysterious and spooky audio visualizer vibe."
 
 ---
 

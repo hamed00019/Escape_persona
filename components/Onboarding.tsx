@@ -68,7 +68,7 @@ export const Onboarding: React.FC<Props> = ({ onStart }) => {
               animate={{ opacity: 1, filter: "blur(0px)" }}
               transition={{ duration: 1, delay: 0.3 }}
             >
-              در تاریکی
+              تحلیل شخصیت
             </motion.span>
             <br />
             <motion.span
@@ -77,7 +77,7 @@ export const Onboarding: React.FC<Props> = ({ onStart }) => {
               transition={{ duration: 1, delay: 0.6 }}
               className="bg-gradient-to-r from-emerald-200 via-cyan-200 to-emerald-200 bg-clip-text text-transparent"
             >
-              کی هستی؟
+              اتاق فرار
             </motion.span>
           </h1>
         </div>
@@ -90,10 +90,10 @@ export const Onboarding: React.FC<Props> = ({ onStart }) => {
           className="space-y-3"
         >
           <p className="text-xl text-slate-300 leading-relaxed font-bold">
-            شخصیت واقعی‌ات رو کشف کن
+            نقش واقعی شما در تیم چیست؟
           </p>
           <p className="text-base text-slate-400 leading-relaxed max-w-md mx-auto">
-            یک تست هوش هیجانی هیجان‌انگیز که نقش واقعی شما رو در اتاق فرار مشخص می‌کنه
+            یک تست روانشناسی دقیق که با تحلیل انتخاب‌های شما در شرایط بحرانی، شخصیت پنهان شما را آشکار می‌کند.
           </p>
 
           {/* Stats */}

@@ -2,26 +2,42 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Question, Option } from '../types';
 import { playSound } from '../utils/sound';
+import { ArrowRight } from 'lucide-react';
 
 interface Props {
   question: Question;
   onAnswer: (option: Option) => void;
+  onBack: () => void;
   totalQuestions: number;
   currentIndex: number;
 }
 
-export const QuestionCard: React.FC<Props> = ({ question, onAnswer, totalQuestions, currentIndex }) => {
-  
+export const QuestionCard: React.FC<Props> = ({ question, onAnswer, onBack, totalQuestions, currentIndex }) => {
+
   const handleOptionClick = (option: Option) => {
     playSound('click');
     onAnswer(option);
   };
 
   return (
-    <div className="w-full max-w-md mx-auto px-4 h-full flex flex-col justify-center">
+    <div className="w-full max-w-md mx-auto px-4 h-full flex flex-col justify-center relative">
+
+      {/* Back Button */}
+      {currentIndex > 0 && (
+        <motion.button
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          onClick={onBack}
+          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors flex items-center gap-2 text-sm font-bold z-20"
+        >
+          <ArrowRight size={16} />
+          <span>قبلی</span>
+        </motion.button>
+      )}
+
       {/* Progress */}
-      <div className="w-full bg-slate-800 h-1 rounded-full mb-8 overflow-hidden">
-        <motion.div 
+      <div className="w-full bg-slate-800 h-1 rounded-full mb-8 overflow-hidden mt-12">
+        <motion.div
           className="h-full bg-violet-500"
           initial={{ width: 0 }}
           animate={{ width: `${((currentIndex) / totalQuestions) * 100}%` }}

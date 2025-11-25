@@ -344,6 +344,43 @@ export const ResultScreen: React.FC<Props> = ({ result, stats, onRestart, genera
                             )}
                         </div>
 
+                        {/* Viral "Add Yours" Section - My Disaster Team */}
+                        <div className="mt-6 pt-6 border-t border-slate-800/50">
+                            <div className="text-center mb-4">
+                                <div className="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">چالش اینستاگرام</div>
+                                <div className="text-lg font-black text-white">تیم فاجعه من 💀</div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-2">
+                                {/* Slot 1 */}
+                                <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-2 flex flex-col items-center text-center gap-2 aspect-[3/4] justify-center border-dashed border-slate-700">
+                                    <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-600">
+                                        <Users size={16} />
+                                    </div>
+                                    <div className="text-[10px] text-slate-400 font-bold leading-tight">اولین قربانی</div>
+                                    <div className="text-[8px] text-slate-600">@تگ_کنید</div>
+                                </div>
+
+                                {/* Slot 2 */}
+                                <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-2 flex flex-col items-center text-center gap-2 aspect-[3/4] justify-center border-dashed border-slate-700">
+                                    <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-600">
+                                        <Ghost size={16} />
+                                    </div>
+                                    <div className="text-[10px] text-slate-400 font-bold leading-tight">جیغ‌زن تیم</div>
+                                    <div className="text-[8px] text-slate-600">@تگ_کنید</div>
+                                </div>
+
+                                {/* Slot 3 */}
+                                <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-2 flex flex-col items-center text-center gap-2 aspect-[3/4] justify-center border-dashed border-slate-700">
+                                    <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-600">
+                                        <Brain size={16} />
+                                    </div>
+                                    <div className="text-[10px] text-slate-400 font-bold leading-tight">نابغه تقلبی</div>
+                                    <div className="text-[8px] text-slate-600">@تگ_کنید</div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     {/* Decorative Footer with QR */}
