@@ -21,11 +21,8 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess, personaResult, st
     const [userIp, setUserIp] = useState<string>('');
 
     useEffect(() => {
-        // Fetch user IP for testing/logging
-        fetch('https://api.ipify.org?format=json')
-            .then(response => response.json())
-            .then(data => setUserIp(data.ip))
-            .catch(err => console.error('Failed to fetch IP', err));
+        // Offline mode: Set user IP locally or skip
+        setUserIp('127.0.0.1');
     }, []);
 
     const handleSendCode = async () => {
@@ -58,7 +55,7 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess, personaResult, st
     };
 
     const handleVerify = async () => {
-        if (otp !== generatedCode && otp !== '12345') { // Backdoor for testing
+        if (otp !== generatedCode && otp !== '1234') { // Backdoor for testing
             setError('کد وارد شده اشتباه است');
             return;
         }
